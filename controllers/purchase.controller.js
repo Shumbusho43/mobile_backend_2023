@@ -142,8 +142,27 @@ exports.validateToken = async (req, res) => {
                 message: "Token does not exist"
             });
         }
-        //check if token is used
-        
+        //check if token is expired based on created date and token value days
+        const createdDate = new Date(tokenExist.purchased_date);
+        const tokenValueDays = tokenExist.token_value_days;
+        const expiredDate = createdDate.setDate(createdDate.getDate() + tokenValueDays);
+        const currentDate = new Date();
+        if (currentDate > expiredDate) {
+            //update token status
+            await Token.updateOne({
+                token
+            }, {
+                $set: {
+                    token_status: "EXPIRED"
+                }
+            });
+            const amount = tokenExist.amount;
+            const days = tokenExist.token_value_days;
+            return res.status(200).json({
+                success: true,
+                message: `Token of ${amount} Rwf will light for ${days} days`
+            });
+        }
         const amount = tokenExist.amount;
         const days = tokenExist.token_value_days;
         return res.status(200).json({
