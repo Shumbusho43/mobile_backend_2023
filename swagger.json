@@ -27,7 +27,10 @@
   "paths": {
     "/purchase": {
       "post": {
-        "description": "",
+        "tags": [
+          "Purchase"
+        ],
+        "description": "Endpoint to purchase electricity.",
         "parameters": [
           {
             "name": "body",
@@ -36,12 +39,6 @@
               "type": "object",
               "properties": {
                 "meter_number": {
-                  "example": "any"
-                },
-                "token_value_days": {
-                  "example": "any"
-                },
-                "purchased_date": {
                   "example": "any"
                 },
                 "amount": {
@@ -64,10 +61,47 @@
         }
       }
     },
-    "/tokens": {
+    "/tokens/{meter_number}": {
       "get": {
-        "description": "",
-        "parameters": [],
+        "tags": [
+          "Tokens"
+        ],
+        "description": "Endpoint to get all tokens against entered meter number.",
+        "parameters": [
+          {
+            "name": "meter_number",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "400": {
+            "description": "Bad Request"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/validate/{token}": {
+      "get": {
+        "tags": [
+          "Tokens"
+        ],
+        "description": "Endpoint to validate token.",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"

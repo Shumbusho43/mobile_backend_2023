@@ -44,7 +44,7 @@ const schema = new mongoose.Schema({
 //validate token
 exports.validateToken = (token) => {
     const schema = Joi.object({
-        meter_number: Joi.string().min(6).max(6).required(),
+        meter_number: Joi.string().required(),
         amount: Joi.number().max(182500).min(100),
     });
     return schema.validate(token);

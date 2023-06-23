@@ -10,21 +10,37 @@ const {
 } = require("../utils/randomId");
 
 exports.purchaseElectricity = async (req, res) => {
+    // #swagger.tags = ['Purchase']
+    // #swagger.description = 'Endpoint to purchase electricity.'
     const {
         meter_number,
-        token_value_days,
-        purchased_date,
         amount
     } = req.body;
     try {
+        //check meter length
+        if (meter_number.length != 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Meter number should be 6 characters"
+            });
+        }
         //validate body
         const {
             error
         } = validateToken(req.body);
         if (error) {
+            //format error message to remove double quotes
+            const message = error.details[0].message.replace(/"/g, "");
             return res.status(400).json({
                 success: false,
-                message: error.details[0].message
+                message
+            });
+        }
+        //check if amount is multiple of 100 
+        if (amount % 100 != 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Amount should be multiple of 100. eg: 100,200,300...........,182500"
             });
         }
         //generate token
@@ -44,8 +60,6 @@ exports.purchaseElectricity = async (req, res) => {
         const data = new Token({
             meter_number,
             token_status: "NEW",
-            token_value_days,
-            purchased_date,
             amount,
             token: token.token,
             id: generateUniqueId(),
@@ -66,11 +80,13 @@ exports.purchaseElectricity = async (req, res) => {
 }
 
 //get all tokens against entered meter number
-exports.getAllTokens = async (req, res) => {
+exports.getAllTokensWithGivenMeterNumebr = async (req, res) => {
+    // #swagger.tags = ['Tokens']
+    // #swagger.description = 'Endpoint to get all tokens against entered meter number.'
     try {
         const {
             meter_number
-        } = req.body;
+        } = req.params;
         //check if meter number is entered
         if (!meter_number) {
             return res.status(400).json({
@@ -114,6 +130,8 @@ exports.getAllTokens = async (req, res) => {
 
 //validate token
 exports.validateToken = async (req, res) => {
+    // #swagger.tags = ['Tokens']
+    // #swagger.description = 'Endpoint to validate token.'
     try {
         const {
             token
